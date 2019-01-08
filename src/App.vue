@@ -6,24 +6,24 @@
         v-for="(row, rowIndex) in tiles"
         v-bind:key="rowIndex"
       >
-        <Square
+        <VTile
           v-for="(tile, columnIndex) in row"
           :key="columnIndex"
           :data="tile"
         >
-        </Square>
+        </VTile>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
-import Square from './components/Tile';
+import VTile from './components/VTile';
 
 export default {
   name: 'App',
   components: {
-    Square,
+    VTile,
   },
   data: () => {
     return {

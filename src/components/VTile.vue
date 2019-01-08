@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'Square',
+  name: 'VTile',
   props: ['data'],
 };
 </script>
