@@ -10,6 +10,8 @@
           v-for="(tile, columnIndex) in row"
           :key="columnIndex"
           :data="tile"
+          @leftClick="openTile"
+          @rightClick="setFlag"
         >
         </VTile>
       </tr>
@@ -33,6 +35,12 @@ export default {
     };
   },
   methods: {
+    /**
+    * flags a tile
+    * @function
+    * @param {Object} tile
+    * @return {undefined}
+    */
     startGame: function() {
       this.tiles = [];
       for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
@@ -48,6 +56,23 @@ export default {
         }
         this.tiles.push(row);
       }
+    },
+    /**
+    * opens a tile
+    * @function
+    * @param {Object} tile
+    * @return {undefined}
+    */
+    openTile: function() {
+    },
+    /**
+    * flags a tile
+    * @function
+    * @param {Object} tile
+    * @return {undefined}
+    */
+    setFlag: function(tile) {
+      tile.class = 'flagged';
     },
   },
 };
