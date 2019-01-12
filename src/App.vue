@@ -32,6 +32,11 @@ export default {
       rows: 10,
       columns: 19,
       tiles: [],
+      isStart: false,
+      isSuccess: false,
+      isFailure: false,
+      neighbour: ['mine-neighbor-1', 'mine-neighbor-2', 'mine-neighbor-3', 'mine-neighbor-4', 'mine-neighbor-5', 'mine-neighbor-6',
+        'mine-neighbor-7', 'mine-neighbor-8', 'mine-neighbor-9'],
     };
   },
   methods: {
@@ -72,8 +77,46 @@ export default {
     * @return {undefined}
     */
     setFlag: function(tile) {
-      tile.class = 'flagged';
+      if (this.isFailure || tile.class === 'opened') {
+        return;
+      }
+      if (tile.class === 'flagged') {
+        tile.class = 'unopened';
+      } else {
+        tile.class = 'flagged';
+      }
     },
+    /**	
+     * opens all tiles	
+     * @function	
+     * @return {undefined}	
+     */	
+    showAllTiles: function() {	
+     },	
+     /**	
+     * returns an array of neighbors surrounding input tile	
+     * @function	
+     * @param {Object} tile	
+     * @return {Array.<Object>} - an array of tile objects	
+     */	
+    getNeighbors: function() {	
+     },	
+    /**	
+     * returns the number of mines within an array of tiles	
+     * @function	
+     * @param {Array.<Object>} neighbors - an array of tile objects	
+     * @return {number} - number of mines in neighbors array	
+     */	
+    countNeighboringMines: function(tile) {	
+     },	
+     /**	
+     * checks if tile is not open	
+     * @function	
+     * @param {Object} tile	
+     * @return {boolean}	
+     */	
+    isUnopened: function() {	
+     },	
   },
 };
 </script>
