@@ -68,7 +68,9 @@ export default {
     * @param {Object} tile
     * @return {undefined}
     */
-    openTile: function() {
+    openTile: function(tile) {
+      const numNeighborMines = this.countNeighboringMines(tile.row, tile.column);
+      this.changeTileClass(tile.row, tile.column, numNeighborMines);
     },
     /**
     * flags a tile
@@ -92,15 +94,7 @@ export default {
      * @return {undefined}	
      */	
     showAllTiles: function() {	
-     },	
-     /**	
-     * returns an array of neighbors surrounding input tile	
-     * @function	
-     * @param {Object} tile	
-     * @return {Array.<Object>} - an array of tile objects	
-     */	
-    getNeighbors: function() {	
-     },	
+    },	
     /**	
      * returns the number of mines within an array of tiles	
      * @function	
@@ -108,15 +102,59 @@ export default {
      * @return {number} - number of mines in neighbors array	
      */	
     countNeighboringMines: function(tile) {	
-     },	
-     /**	
-     * checks if tile is not open	
+      let countNeighborMine = 0;
+      const selectNeighboringTiles = [
+        { row:  1, col:  0 },
+        { row:  1, col:  1 },
+        { row:  0, col:  1 },
+        { row: -1, col:  1 },
+        { row: -1, col:  0 },
+        { row: -1, col: -1 },
+        { row:  0, col: -1 },
+        { row:  1, col: -1 },
+      ];
+      selectNeighboringTiles.forEach(neighborTile => {
+        const neighborRow = tile.row + neighborTile.row;
+        const neighborCol = tile.col + neighborTile.col;
+        if (!this.isValid(neighborRow, neighborCol)) {
+          return;
+        }
+        const neigbor = this.tiles[neighborRow][neighborCol];
+        if (neigbor.isMined) {
+          countNeighborMine += 1;
+        }
+      });
+      return countNeighborMine;	
+    },
+    /**
+     * change ClassName Based on MineCount
+     * @function
+     * @param {number} row
+     * @param {number} col
+     * @param {number} numNeighborMines
+     * @return {undefined}
+     */
+    changeTileClass: function(row, col, numNeighborMines) {
+      if (numNeighborMines > 9) {
+        return null;
+      }
+      this.tiles[row][col].state = `mine-neighbor-${numNeighborMines}`;
+      if (numNeighborMines == 0) {
+        return this.tiles[row][col].state = 'opened';
+      }
+      if (this.tiles[row][col].mined) {
+        return this.tiles[row][col].state = 'mine';
+      }
+    },	
+    /**	
+     * valid tile
      * @function	
      * @param {Object} tile	
      * @return {boolean}	
      */	
-    isUnopened: function() {	
-     },	
+    isValid: function(row, column) {
+      return !(this.tiles[row] && this.tiles[row][column]);
+    },	
   },
 };
 </script>
