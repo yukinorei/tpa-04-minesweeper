@@ -2,6 +2,7 @@
   <td
     v-bind:class="data.class"
     v-on:contextmenu.prevent="$emit('rightClick', data)"
+    @click="$emit('leftClick', data)"
   >
   </td>
 </template>
@@ -10,6 +11,14 @@
 export default {
   name: 'VTile',
   props: ['data'],
+  methods: {
+    clickLeft: function() {
+      this.$emit('leftClick', this);
+    },
+    clickRight: function() {
+      this.$emit('rightClick', this);
+    },
+  },
 };
 </script>
 

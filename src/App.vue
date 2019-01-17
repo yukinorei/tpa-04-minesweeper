@@ -27,16 +27,11 @@ export default {
   components: {
     VTile,
   },
-  data: () => {
+  data: function() {
     return {
       rows: 10,
       columns: 19,
       tiles: [],
-      isStart: false,
-      isSuccess: false,
-      isFailure: false,
-      neighbour: ['mine-neighbor-1', 'mine-neighbor-2', 'mine-neighbor-3', 'mine-neighbor-4', 'mine-neighbor-5', 'mine-neighbor-6',
-        'mine-neighbor-7', 'mine-neighbor-8', 'mine-neighbor-9'],
     };
   },
   methods: {
@@ -54,7 +49,7 @@ export default {
           let tile = {
             row: rowIndex,
             column: columnIndex,
-            mined: Math.random() * 6 > 5,
+            isMined: Math.random() * 6 > 5,
             class: 'unopened',
           };
           row.push(tile);
@@ -69,8 +64,21 @@ export default {
     * @return {undefined}
     */
     openTile: function(tile) {
-      const numNeighborMines = this.countNeighboringMines(tile.row, tile.column);
-      this.changeTileClass(tile.row, tile.column, numNeighborMines);
+      if (tile.isMined) {
+        this.changeTileClass(tile, 'mine');
+        this.showAllTiles();
+      } else {
+        const neighborMines = this.countNeighboringMines(tile);
+        const numNeighborMines = neighborMines.filter(neighborTile => neighborTile.isMined).length;
+        if (numNeighborMines > 0) {
+          this.changeTileClass(tile, `mine-neighbor-${numNeighborMines}`);
+        } else {
+          this.changeTileClass(tile, 'opened');
+          neighborMines.forEach(neighborTile => {
+            if (!this.isTileOpened(neighborTile)) this.openTile(neighborTile);
+          });
+        }
+      }
     },
     /**
     * flags a tile
@@ -79,13 +87,11 @@ export default {
     * @return {undefined}
     */
     setFlag: function(tile) {
-      if (this.isFailure || tile.class === 'opened') {
-        return;
-      }
+      if (this.isTileOpened(tile)) return;
       if (tile.class === 'flagged') {
-        tile.class = 'unopened';
+        this.changeTileClass(tile, 'unopened');
       } else {
-        tile.class = 'flagged';
+        this.changeTileClass(tile, 'flagged');
       }
     },
     /**	
@@ -94,6 +100,22 @@ export default {
      * @return {undefined}	
      */	
     showAllTiles: function() {	
+      this.tiles.forEach(tilesRow => {
+        tilesRow.forEach(tile => {
+          if (this.isTileOpened(tile)) return;
+          if (tile.isMined) {
+            tile.class = 'mine';
+          } else {
+            const neighborTiles = this.countNeighboringMines(tile);
+            const numNeighborMines = neighborTiles.filter(neighborTile => neighborTile.isMined).length;
+            if (numNeighborMines > 0) {
+              tile.class = `mine-neighbor-${numNeighborMines}`;
+            } else {
+              tile.class = 'opened';
+            }
+          }
+        });
+      });
     },	
     /**	
      * returns the number of mines within an array of tiles	
@@ -102,29 +124,28 @@ export default {
      * @return {number} - number of mines in neighbors array	
      */	
     countNeighboringMines: function(tile) {	
-      let countNeighborMine = 0;
+      let neighborTiles = [];
       const selectNeighboringTiles = [
-        { row:  1, col:  0 },
-        { row:  1, col:  1 },
-        { row:  0, col:  1 },
-        { row: -1, col:  1 },
-        { row: -1, col:  0 },
-        { row: -1, col: -1 },
-        { row:  0, col: -1 },
-        { row:  1, col: -1 },
+        { row:  1, column:  0 },
+        { row:  1, column:  1 },
+        { row:  0, column:  1 },
+        { row: -1, column:  1 },
+        { row: -1, column:  0 },
+        { row: -1, column: -1 },
+        { row:  0, column: -1 },
+        { row:  1, column: -1 },
       ];
       selectNeighboringTiles.forEach(neighborTile => {
         const neighborRow = tile.row + neighborTile.row;
-        const neighborCol = tile.col + neighborTile.col;
-        if (!this.isValid(neighborRow, neighborCol)) {
+        const neighborCol = tile.column + neighborTile.column;
+        if (!this.isPosition(neighborRow, neighborCol)) {
           return;
         }
-        const neigbor = this.tiles[neighborRow][neighborCol];
-        if (neigbor.isMined) {
-          countNeighborMine += 1;
-        }
+        const neighbor = this.tiles[neighborRow][neighborCol];
+        neighborTiles.push(neighbor);
+
       });
-      return countNeighborMine;	
+      return neighborTiles;	
     },
     /**
      * change ClassName Based on MineCount
@@ -134,27 +155,15 @@ export default {
      * @param {number} numNeighborMines
      * @return {undefined}
      */
-    changeTileClass: function(row, col, numNeighborMines) {
-      if (numNeighborMines > 9) {
-        return null;
-      }
-      this.tiles[row][col].state = `mine-neighbor-${numNeighborMines}`;
-      if (numNeighborMines == 0) {
-        return this.tiles[row][col].state = 'opened';
-      }
-      if (this.tiles[row][col].mined) {
-        return this.tiles[row][col].state = 'mine';
-      }
+    changeTileClass: function(tile, newTileClass) {
+      this.tiles[tile.row][tile.column].class = newTileClass;
     },	
-    /**	
-     * valid tile
-     * @function	
-     * @param {Object} tile	
-     * @return {boolean}	
-     */	
-    isValid: function(row, column) {
-      return !(this.tiles[row] && this.tiles[row][column]);
-    },	
+    isPosition: function(row, column) {
+      return (0 <= row && row <= this.rows - 1) && (0 <= column && column <= this.columns - 1);
+    },
+    isTileOpened: function(tile) {
+      return tile.class !== 'unopened' && tile.class !== 'flagged';
+    }	
   },
 };
 </script>
