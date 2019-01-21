@@ -138,7 +138,7 @@ export default {
       selectNeighboringTiles.forEach(neighborTile => {
         const neighborRow = tile.row + neighborTile.row;
         const neighborCol = tile.column + neighborTile.column;
-        if (!this.isPosition(neighborRow, neighborCol)) {
+        if (!this.isValidTile(neighborRow, neighborCol)) {
           return;
         }
         const neighbor = this.tiles[neighborRow][neighborCol];
@@ -158,7 +158,7 @@ export default {
     changeTileClass: function(tile, newTileClass) {
       this.tiles[tile.row][tile.column].class = newTileClass;
     },	
-    isPosition: function(row, column) {
+    isValidTile: function(row, column) {
       return (0 <= row && row <= this.rows - 1) && (0 <= column && column <= this.columns - 1);
     },
     isTileOpened: function(tile) {
